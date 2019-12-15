@@ -6,6 +6,7 @@
 package com.yildirimbayrakci.lms;
 
 import com.yildirimbayrakci.entity.Account;
+import com.yildirimbayrakci.entity.Book;
 import com.yildirimbayrakci.entity.BorrowHistory;
 import com.yildirimbayrakci.util.DateUtils;
 import com.yildirimbayrakci.util.HibernateUtils;
@@ -13,6 +14,7 @@ import com.yildirimbayrakci.util.Search;
 import com.yildirimbayrakci.util.TableColumnAdjuster;
 import com.yildirimbayrakci.util.MyPdfWriter;
 import java.util.List;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
@@ -273,11 +275,11 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
                     .addComponent(jPasswordField_newPwConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jCheckBox_showPassword)
-                .addGap(14, 14, 14)
+                .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(JButton_updateUserInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(JButton_changePw, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(129, 129, 129))
+                    .addComponent(JButton_updateUserInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(JButton_changePw, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(157, 157, 157))
         );
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
@@ -362,6 +364,13 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
             history = Search.searchBorrowHistory(accountId, false);
         }
 
+        Account account = Search.searchUser(accountId);
+        Set<Book> reservedBooks = account.getReservedBooks();
+       /*
+        for(Book b: reservedBooks){
+            dtm.addRow(new Object);
+        }*/
+        
         history.forEach((bh) -> {
             dtm.addRow(new Object[]{bh.getBorrowId(), bh.getBook().getBookId(), bh.getBook().getTitle(),
                 DateUtils.formatDate(bh.getBorrowDate()), DateUtils.formatDate(bh.getDueDate()),

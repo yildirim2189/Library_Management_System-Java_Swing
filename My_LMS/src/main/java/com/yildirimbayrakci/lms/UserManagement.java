@@ -546,7 +546,23 @@ public class UserManagement extends javax.swing.JInternalFrame {
                             } else if (book.getBookStatus() == BookStatus.KAYIP) {
                                 jLabel_messageField.setText(id + " numaralı kitap kayıp.");
                             } else if (book.getBookStatus() == BookStatus.REZERVE) {
-                                jLabel_messageField.setText(id + " numaralı kitap rezerve edilmiştir.");
+                                boolean isReservedByThisUser = false;
+                                for(Book b : account.getReservedBooks()){
+                                    if(b.getBookId() == bookId){
+                                        isReservedByThisUser= true;
+                                    }
+                                }
+                                if(isReservedByThisUser){
+                                    // reserved by that user so give to user
+                                    System.out.println("BEN REZERVE ETMİŞTİM.");
+                                    HibernateUtils.removeReservation(bookId, accountId);
+                                    HibernateUtils.lendBook(accountId, bookId);       
+                                }
+                                else{
+                                    jLabel_messageField.setText(id + " numaralı kitap başka birisi tarafından rezerve edilmiştir.");
+                                    for(Book b : account.getReservedBooks())
+                                        System.out.println("Reserved: " + b.getTitle());
+                                }
                             } else {
                                 HibernateUtils.lendBook(accountId, bookId);
 

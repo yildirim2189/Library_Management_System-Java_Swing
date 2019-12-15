@@ -46,7 +46,7 @@ public class HibernateUtils {
     }
 
     public static List<Category> bringCategories() {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             String hql = "FROM Category c";
@@ -60,7 +60,7 @@ public class HibernateUtils {
     }
 
     public static int addBook(String isbn, String title, String author, String publisher, int numberOfPages, int year, String category, String status) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             BookStatus bookStatus = BookStatus.MEVCUT;
@@ -86,7 +86,7 @@ public class HibernateUtils {
     }
 
     public static boolean deleteBook(int id) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
             Book book = session.get(Book.class, id);
             session.delete(book);
@@ -98,7 +98,7 @@ public class HibernateUtils {
     }
 
     public static boolean editBook(int id, String isbn, String title, String author, String publisher, int numberOfPages, int year, String category, String status) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             BookStatus bookStatus = BookStatus.MEVCUT;
@@ -124,31 +124,33 @@ public class HibernateUtils {
     }
 
     public static boolean editUser(String id, String firstName, String lastName, String email, String phone, String status, String type) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             AccountStatus accountStatus = AccountStatus.AKTIF;
             AccountType accountType = AccountType.UYE;
-            
-            for(AccountStatus as : AccountStatus.values()){
-                if(as.displayName().equals(status))
+
+            for (AccountStatus as : AccountStatus.values()) {
+                if (as.displayName().equals(status)) {
                     accountStatus = as;
+                }
             }
-            
-            for(AccountType at: AccountType.values()){
-                if(at.displayName().equals(type))
+
+            for (AccountType at : AccountType.values()) {
+                if (at.displayName().equals(type)) {
                     accountType = at;
+                }
             }
-            
+
             Account account = session.get(Account.class, id);
-            
+
             account.setFirstName(firstName);
             account.setLastName(lastName);
             account.setEmail(email);
             account.setPhone(phone);
             account.setStatus(accountStatus);
             account.setType(accountType);
-            
+
             session.update(account);
             session.getTransaction().commit();
             return true;
@@ -159,7 +161,7 @@ public class HibernateUtils {
     }
 
     public static void addUser(String id, String password, String firstName, String lastName, String email, String phone, AccountStatus status, AccountType type) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             String HashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -172,12 +174,12 @@ public class HibernateUtils {
 
             session.getTransaction().commit();
 
-            JavaMail.sendEmail(id,firstName + " " + lastName, email, password, JavaMail.INITIAL_PASSWORD);
+            JavaMail.sendEmail(id, firstName + " " + lastName, email, password, JavaMail.INITIAL_PASSWORD);
         }
     }
 
     public static void deleteUser(String id) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
             Account account = session.get(Account.class, id);
             session.delete(account);
@@ -186,7 +188,7 @@ public class HibernateUtils {
     }
 
     public static void lendBook(String accountId, int bookId) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
             Date borrowdate = new Date();
             Date dueDate = DateUtils.addDays(borrowdate, 15);
@@ -203,14 +205,19 @@ public class HibernateUtils {
     }
 
     public static void returnBook(int bookId) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
             String hql = "SELECT Bh From BorrowHistory Bh"
                     + " WHERE Bh.book=" + bookId + " AND Bh.returnDate IS NULL";
 
             BorrowHistory bh = session.createQuery(hql, BorrowHistory.class).getSingleResult();
 
-            bh.getBook().setBookStatus(BookStatus.MEVCUT);
+            if (bh.getBook().getUsersReservedBy().isEmpty()) {
+                bh.getBook().setBookStatus(BookStatus.MEVCUT);
+            } else {
+                bh.getBook().setBookStatus(BookStatus.REZERVE);
+            }
+
             Date returnDate = new Date();
             bh.setReturnDate(returnDate);
 
@@ -222,13 +229,13 @@ public class HibernateUtils {
             }
 
             session.getTransaction().commit();
-            
+
             // check reservations and if there's send email to reservation owner.
         }
     }
 
     public static Account updateUserContact(String accountId, String email, String phone) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             Account account = session.get(Account.class, accountId);
@@ -245,7 +252,7 @@ public class HibernateUtils {
 
     public static boolean authenticateUser(String accountId, String password) {
         boolean testPw;
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             Account account = session.get(Account.class, accountId);
@@ -259,7 +266,7 @@ public class HibernateUtils {
     }
 
     public static void changePw(String accountId, String newPw) {
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             Account account = session.get(Account.class, accountId);
@@ -270,14 +277,14 @@ public class HibernateUtils {
             session.update(account);
             session.getTransaction().commit();
 
-            JavaMail.sendEmail(accountId,account.getFirstName() + " " + account.getLastName(),
+            JavaMail.sendEmail(accountId, account.getFirstName() + " " + account.getLastName(),
                     account.getEmail(), newPw, JavaMail.CHANGED_PASSWORD);
         }
     }
 
     public static boolean isUsernameExist(String accountId) {
         boolean result;
-        try ( Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
             session.beginTransaction();
 
             Account account = session.get(Account.class, accountId);
@@ -291,5 +298,35 @@ public class HibernateUtils {
             session.getTransaction().commit();
         }
         return result;
+    }
+
+    public static void reserveBook(int bookId, String userId) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+            session.beginTransaction();
+
+            Book book = session.get(Book.class, bookId);
+            Account account = session.get(Account.class, userId);
+
+            account.addBooktoReserve(book);
+
+            session.update(account);
+
+            session.getTransaction().commit();
+        }
+    }
+
+    public static void removeReservation(int bookId, String userId) {
+        try (Session session = HibernateUtils.getSessionFactory().getCurrentSession()) {
+            session.beginTransaction();
+
+            Book book = session.get(Book.class, bookId);
+            Account account = session.get(Account.class, userId);
+
+            account.removeBookFromReserve(book);
+
+            session.update(account);
+
+            session.getTransaction().commit();
+        }
     }
 }

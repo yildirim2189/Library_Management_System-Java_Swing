@@ -29,52 +29,51 @@ import javax.persistence.TemporalType;
  *
  * @author YILDIRIM
  */
-
 @Entity
 @Table(name = "account")
 public class Account {
-    
+
     @Id
     @Column(name = "account_id")
     private String accountId;
-    
+
     @Column(name = "password")
     private String password;
-    
+
     @Column(name = "first_name")
     private String firstName;
-    
+
     @Column(name = "last_name")
     private String lastName;
-    
+
     @Column(name = "email")
     private String email;
-    
+
     @Column(name = "phone")
     private String phone;
-    
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AccountStatus status;
-    
+
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     private AccountType type;
-    
+
     @Column(name = "creation_date")
     @Temporal(TemporalType.DATE)
     private Date creationDate;
-    
-    
+
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<BorrowHistory> borrowHistory;
-    
-    @ManyToMany
-    @JoinTable(name = "book_reservation", 
-            joinColumns = {@JoinColumn(name = "book_id")},
-            inverseJoinColumns = {@JoinColumn(name = "account_id")})
-    private Set<Book> reservedBooks;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "book_reservation",
+            joinColumns = {
+                @JoinColumn(name = "account_id")},
+            inverseJoinColumns = {
+                @JoinColumn(name = "book_id")})
+    private Set<Book> reservedBooks;
 
     public Account() {
     }
@@ -98,8 +97,6 @@ public class Account {
     public void setReservedBooks(Set<Book> reservedBooks) {
         this.reservedBooks = reservedBooks;
     }
-    
-    
 
     public String getAccountId() {
         return accountId;
@@ -179,6 +176,15 @@ public class Account {
 
     public void setBorrowHistory(List<BorrowHistory> borrowHistory) {
         this.borrowHistory = borrowHistory;
-    } 
-}
+    }
 
+    public void addBooktoReserve(Book book) {
+        this.reservedBooks.add(book);
+        book.getUsersReservedBy().add(this);
+    }
+
+    public void removeBookFromReserve(Book book) {
+        this.reservedBooks.remove(book);
+        book.getUsersReservedBy().remove(this);
+    }
+}

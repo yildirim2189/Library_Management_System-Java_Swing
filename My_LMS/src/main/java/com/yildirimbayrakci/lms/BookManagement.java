@@ -39,10 +39,12 @@ public class BookManagement extends javax.swing.JInternalFrame {
      * @param account Account class object.
      */
 
+    private Account account;
 
     public BookManagement(Account account) {
         
         initComponents();
+        this.account = account;
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
         BasicInternalFrameUI bif = (BasicInternalFrameUI) this.getUI();
         bif.setNorthPane(null);
@@ -619,7 +621,20 @@ public class BookManagement extends javax.swing.JInternalFrame {
         // TODO add your handling code here:
         int selectedRow = jTable_books.getSelectedRow();
         if(selectedRow == -1){
-            jLabel_message.setText("Lütfen rezerve etmek için bir kitap");
+            jLabel_message.setText("Lütfen rezerve etmek için bir kitap seçiniz.");
+        }else{
+            int bookId = (int) jTable_books.getValueAt(selectedRow, 0);
+            Book book = Search.searchBook(bookId);
+            if(!book.getBookStatus().equals(BookStatus.ODUNC_ALINMIS))
+                jLabel_message.setText("Rezerve etmek için kitap ödünç alınmış olmalıdır.");
+            else{
+                String userId = account.getAccountId();
+                HibernateUtils.reserveBook(bookId, userId);
+                jLabel_message.setText(bookId + "numaralı kitap rezerve edildi.");
+            }
+                
+            
+            
         }
     }//GEN-LAST:event_jButton_reserveBookActionPerformed
 

@@ -66,7 +66,7 @@ public class Book {
     @OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
     private List<BorrowHistory> borrowHistory;
 
-    @ManyToMany(mappedBy = "reservedBooks")
+    @ManyToMany(mappedBy = "reservedBooks", fetch = FetchType.EAGER)
     private Set<Account> usersReservedBy;
     
     
