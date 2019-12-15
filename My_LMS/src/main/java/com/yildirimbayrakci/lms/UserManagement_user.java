@@ -89,6 +89,7 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable_reserved = new javax.swing.JTable();
         jLabel9 = new javax.swing.JLabel();
+        jButton_cancelReservation = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(222, 222, 222));
         setPreferredSize(new java.awt.Dimension(930, 510));
@@ -181,6 +182,13 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
 
         jLabel9.setText("Rezerve Edilmiş Kitaplar");
 
+        jButton_cancelReservation.setText("Rezerve İptal");
+        jButton_cancelReservation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton_cancelReservationActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -244,6 +252,8 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
                                     .addComponent(jPasswordField_newPw)))))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButton_cancelReservation, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -301,7 +311,9 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
                     .addComponent(jLabel9)
                     .addComponent(jCheckBox_showPassword))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton_cancelReservation))
                 .addGap(339, 339, 339))
         );
 
@@ -377,6 +389,18 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_jCheckBox_showPasswordActionPerformed
 
+    private void jButton_cancelReservationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_cancelReservationActionPerformed
+        int selected = jTable_reserved.getSelectedRow();
+        if(selected == -1){
+            jLabel_messageField.setText("Lütfen iptal etmek için bir kayıt seçiniz.");
+        }else{
+            jLabel_messageField.setText("Rezervasyon iptal edildi.");
+            int bookId = (int)jTable_reserved.getValueAt(selected, 0);
+            HibernateUtils.removeReservation(bookId, account.getAccountId());
+            updateLendTable(account.getAccountId());
+        }
+    }//GEN-LAST:event_jButton_cancelReservationActionPerformed
+
     private void updateLendTable(String accountId) {
         DefaultTableModel dtm = (DefaultTableModel) jTable_lending.getModel();
         dtm.setRowCount(0);
@@ -429,6 +453,7 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
     private javax.swing.JButton JButton_changePw;
     private javax.swing.JButton JButton_updateUserInfo;
     private javax.swing.JButton jButton_bringBooks;
+    private javax.swing.JButton jButton_cancelReservation;
     private javax.swing.JButton jButton_createPDF1;
     private javax.swing.JCheckBox jCheckBox_bringReturnedBooks;
     private javax.swing.JCheckBox jCheckBox_showPassword;

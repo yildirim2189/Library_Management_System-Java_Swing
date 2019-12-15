@@ -260,5 +260,25 @@ public class Search {
 
         return result;
     }
+    
+    public static Account bringCurrentBorrower(int bookId){
+        Account account = null;
+        try(Session session = HibernateUtils.getSessionFactory().getCurrentSession()){
+            session.beginTransaction();
+            
+              String hql = "SELECT bh FROM BorrowHistory bh "
+                    + "WHERE bh.book =" + bookId + " AND bh.returnDate IS NULL";
+
+            BorrowHistory bh =(BorrowHistory) session.createQuery(hql).getSingleResult();
+            
+            account = bh.getAccount();
+            
+            session.getTransaction().commit();
+        
+        }
+        
+        
+        return account;
+    }
 
 }

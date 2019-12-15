@@ -2,6 +2,7 @@ package com.yildirimbayrakci.lms;
 
 import com.yildirimbayrakci.entity.Account;
 import com.yildirimbayrakci.entity.Book;
+import com.yildirimbayrakci.entity.BorrowHistory;
 import com.yildirimbayrakci.entity.Category;
 import com.yildirimbayrakci.enums_and_constants.AccountType;
 import com.yildirimbayrakci.enums_and_constants.BookStatus;
@@ -629,8 +630,19 @@ public class BookManagement extends javax.swing.JInternalFrame {
             if (!book.getBookStatus().equals(BookStatus.ODUNC_ALINMIS)) {
                 jLabel_message.setText("Rezerve etmek için kitap ödünç alınmış olmalıdır.");
             } else {
+                 
                 String userId = account.getAccountId();
                 Account account = Search.searchUser(userId);
+                // Should not be able to reserve book which same user borrowed
+                System.out.println("TEST2");
+                Account borrower = Search.bringCurrentBorrower(bookId);
+                System.out.println("TEST");
+                if(borrower.getAccountId().equals(userId)){
+                    jLabel_message.setText("Kitap tarafınızca ödünç alınmıştır. Rezerve edilemez.");
+                    return;
+                }
+                
+               
                 if (account.getReservedBooks().size() >= 3) {
                     jLabel_message.setText("3 adetten fazla kitap rezerve edemezsiniz.");
                 } else {
