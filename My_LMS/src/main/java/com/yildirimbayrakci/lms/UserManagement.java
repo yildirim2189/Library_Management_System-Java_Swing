@@ -554,7 +554,7 @@ public class UserManagement extends javax.swing.JInternalFrame {
                                 }
                                 if(isReservedByThisUser){
                                     // reserved by that user so give to user
-                                    System.out.println("BEN REZERVE ETMİŞTİM.");
+                                    jLabel_messageField.setText(id + " numaralı kitap başarıyla ödünç verildi. Rezervasyon güncellendi.");
                                     HibernateUtils.removeReservation(bookId, accountId);
                                     HibernateUtils.lendBook(accountId, bookId);       
                                 }

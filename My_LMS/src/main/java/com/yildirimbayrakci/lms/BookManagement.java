@@ -25,24 +25,25 @@ import javax.swing.table.DefaultTableModel;
 
 /**
  * Kitap yönetimi için tanımlanmış bir sınıftır.
+ *
  * @since 26/11/2019
  * @author YILDIRIM
- * 
- * 
- * 
- * 
+ *
+ *
+ *
+ *
  */
 public class BookManagement extends javax.swing.JInternalFrame {
 
     /**
      * Creates new form BookManagement
+     *
      * @param account Account class object.
      */
-
     private Account account;
 
     public BookManagement(Account account) {
-        
+
         initComponents();
         this.account = account;
         setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -76,8 +77,8 @@ public class BookManagement extends javax.swing.JInternalFrame {
         jTable_books.getColumnModel().getColumn(7).setCellRenderer(new CustomRenderer());
 
         jPanel_reservation.setVisible(false);
-        
-        if(account.getType() != AccountType.ADMIN){
+
+        if (account.getType() != AccountType.ADMIN) {
             jPanel_BookEditingArea.setVisible(false);
             jPanel_reservation.setVisible(true);
         }
@@ -579,8 +580,8 @@ public class BookManagement extends javax.swing.JInternalFrame {
             String bookName = jTable_books.getValueAt(selectedRow, 2).toString();
 
             int answer = CustomDialog.showDialog(null, "<html>Kitap Id: " + id + "<br/>"
-                + "Başlık: " + bookName + "<br/>"
-                + "Bu kitabı silmek istediğinize emin misiniz?</html>");
+                    + "Başlık: " + bookName + "<br/>"
+                    + "Bu kitabı silmek istediğinize emin misiniz?</html>");
 
             if (answer == JOptionPane.YES_OPTION) {
                 boolean success = HibernateUtils.deleteBook(id);
@@ -620,21 +621,25 @@ public class BookManagement extends javax.swing.JInternalFrame {
     private void jButton_reserveBookActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton_reserveBookActionPerformed
         // TODO add your handling code here:
         int selectedRow = jTable_books.getSelectedRow();
-        if(selectedRow == -1){
+        if (selectedRow == -1) {
             jLabel_message.setText("Lütfen rezerve etmek için bir kitap seçiniz.");
-        }else{
+        } else {
             int bookId = (int) jTable_books.getValueAt(selectedRow, 0);
             Book book = Search.searchBook(bookId);
-            if(!book.getBookStatus().equals(BookStatus.ODUNC_ALINMIS))
+            if (!book.getBookStatus().equals(BookStatus.ODUNC_ALINMIS)) {
                 jLabel_message.setText("Rezerve etmek için kitap ödünç alınmış olmalıdır.");
-            else{
+            } else {
                 String userId = account.getAccountId();
-                HibernateUtils.reserveBook(bookId, userId);
-                jLabel_message.setText(bookId + "numaralı kitap rezerve edildi.");
+                Account account = Search.searchUser(userId);
+                if (account.getReservedBooks().size() >= 3) {
+                    jLabel_message.setText("3 adetten fazla kitap rezerve edemezsiniz.");
+                } else {
+                    HibernateUtils.reserveBook(bookId, userId);
+                    jLabel_message.setText(bookId + " numaralı kitap başarıyla rezerve edildi.");
+                }
+
             }
-                
-            
-            
+
         }
     }//GEN-LAST:event_jButton_reserveBookActionPerformed
 

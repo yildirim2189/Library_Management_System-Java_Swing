@@ -86,9 +86,13 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
         jPasswordField_newPwConfirm = new javax.swing.JPasswordField();
         JButton_changePw = new javax.swing.JButton();
         jCheckBox_showPassword = new javax.swing.JCheckBox();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTable_reserved = new javax.swing.JTable();
+        jLabel9 = new javax.swing.JLabel();
 
         setBackground(new java.awt.Color(222, 222, 222));
         setPreferredSize(new java.awt.Dimension(930, 510));
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setBackground(new java.awt.Color(222, 222, 222));
         jPanel1.setPreferredSize(new java.awt.Dimension(870, 500));
@@ -167,6 +171,16 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
             }
         });
 
+        jTable_reserved.setModel(new javax.swing.table.DefaultTableModel(
+            null,
+            new String [] {
+                "Id", "Başlık", "Yazar"
+            }
+        ));
+        jScrollPane1.setViewportView(jTable_reserved);
+
+        jLabel9.setText("Rezerve Edilmiş Kitaplar");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -224,12 +238,17 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
                                     .addComponent(jLabel2)
                                     .addComponent(jLabel3))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 38, Short.MAX_VALUE)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jCheckBox_showPassword)
-                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jPasswordField_userPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
-                                        .addComponent(jPasswordField_newPwConfirm)
-                                        .addComponent(jPasswordField_newPw)))))))
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jPasswordField_userPassword, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
+                                    .addComponent(jPasswordField_newPwConfirm)
+                                    .addComponent(jPasswordField_newPw)))))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 520, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jCheckBox_showPassword)))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -274,15 +293,19 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
                     .addComponent(jLabel3)
                     .addComponent(jPasswordField_newPwConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jCheckBox_showPassword)
-                .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(JButton_updateUserInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(JButton_changePw, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(157, 157, 157))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel9)
+                    .addComponent(jCheckBox_showPassword))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 85, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(339, 339, 339))
         );
 
-        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
+        getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 531));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -366,18 +389,25 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
 
         Account account = Search.searchUser(accountId);
         Set<Book> reservedBooks = account.getReservedBooks();
-       /*
-        for(Book b: reservedBooks){
-            dtm.addRow(new Object);
-        }*/
-        
+
         history.forEach((bh) -> {
             dtm.addRow(new Object[]{bh.getBorrowId(), bh.getBook().getBookId(), bh.getBook().getTitle(),
                 DateUtils.formatDate(bh.getBorrowDate()), DateUtils.formatDate(bh.getDueDate()),
                 DateUtils.formatDate(bh.getReturnDate())});
         });
+
+        DefaultTableModel dtm2 = (DefaultTableModel) jTable_reserved.getModel();
+        dtm2.setRowCount(0);
+        for (Book b : reservedBooks) {
+            dtm2.addRow(new Object[]{b.getBookId(),b.getTitle(),b.getAuthor()});
+        }
+
+        jTable_reserved.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);  
+        TableColumnAdjuster tca = new TableColumnAdjuster(jTable_reserved);
+        tca.adjustColumns();
+        
         jTable_lending.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-        TableColumnAdjuster tca = new TableColumnAdjuster(jTable_lending);
+        tca = new TableColumnAdjuster(jTable_lending);
         tca.adjustColumns();
 
         jLabel_numberOfBooksBorrowed.setText("Ödünç Alınan Kitap Sayısı: " + history.size());
@@ -412,15 +442,18 @@ public class UserManagement_user extends javax.swing.JInternalFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel_messageField;
     private javax.swing.JLabel jLabel_numberOfBooksBorrowed;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPasswordField jPasswordField_newPw;
     private javax.swing.JPasswordField jPasswordField_newPwConfirm;
     private javax.swing.JPasswordField jPasswordField_userPassword;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTable jTable_lending;
+    private javax.swing.JTable jTable_reserved;
     private javax.swing.JTextField jTextField_account_type;
     private javax.swing.JTextField jTextField_email;
     private javax.swing.JTextField jTextField_phone;
